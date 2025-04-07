@@ -1,5 +1,5 @@
 import { NextFunction, Response } from 'express';
-import { HttpException } from '@exceptions/httpException';
+import { HttpException } from '@exceptions/HttpException';
 import { DataStoredInToken, RequestWithUser } from '@interfaces/auth.interface';
 
 // TODO: Implement Checking of Auth code here
