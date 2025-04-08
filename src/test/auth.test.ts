@@ -23,7 +23,7 @@ describe('TEST Authorization API', () => {
   });
 
   describe('[POST] /login', () => {
-    it('response should have the Set-Cookie header with the Authorization token', () => {
+    it('response should have the Set-Cookie header with the Authorization token and RefreshToken', () => {
       const userData: User = {
         email: 'example1@email.com',
         password: 'password123456789',
@@ -33,6 +33,19 @@ describe('TEST Authorization API', () => {
         .post('/login')
         .send(userData)
         .expect('Set-Cookie', /^Authorization=.+/)
+        .expect(200);
+    });
+
+    it('response should have the Set-Cookie header with the RefreshToken token', () => {
+      const userData: User = {
+        email: 'example1@email.com',
+        password: 'password123456789',
+      };
+
+      return request(app.getServer())
+        .post('/login')
+        .send(userData)
+        .expect('Set-Cookie', /RefreshToken=.+/)
         .expect(200);
     });
   });
