@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { Container } from 'typedi';
 import { RequestWithUser } from '@interfaces/auth.interface';
+import { HttpException } from '@exceptions/HttpException';
 import { User } from '@interfaces/users.interface';
 import { AuthService } from '@services/auth.service';
 import { isProduction } from '@config';
@@ -45,6 +46,27 @@ export class AuthController {
         maxAge: 365 * 24 * 60 * 60 * 1000, // 365 days
       });
       res.status(200).json({ data: { user }, message: 'login' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public refresh = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const refreshToken = req.cookies?.RefreshToken;
+
+      if (!refreshToken) throw new HttpException(400, 'Refresh token is required');
+
+      const newAccessToken = await this.auth.refreshToken(refreshToken);
+
+      res.cookie('Authorization', newAccessToken, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: 'strict',
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      });
+
+      res.status(200).json({ message: 'Authorization token refreshed' });
     } catch (error) {
       next(error);
     }

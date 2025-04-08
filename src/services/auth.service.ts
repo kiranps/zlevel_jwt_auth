@@ -27,7 +27,7 @@ export class AuthService {
     const isPasswordMatching: boolean = await compare(userData.password, findUser.password);
     if (!isPasswordMatching) throw new HttpException(409, "You're password not matching");
 
-    const payload: DataStoredInToken = {id: findUser.id}
+    const payload: DataStoredInToken = { id: findUser.id };
 
     const accessToken = this.jwtService.generateAccessToken(payload);
     const refreshToken = this.jwtService.generateRefreshToken(payload);
@@ -40,5 +40,20 @@ export class AuthService {
     if (!findUser) throw new HttpException(409, "User doesn't exist");
 
     return findUser;
+  }
+
+  public async refreshToken(refreshToken: string): Promise<string> {
+    try {
+      const jwtData = this.jwtService.verifyRefreshToken(refreshToken);
+      const findUser: User = UserModel.find(user => user.id === jwtData.id);
+      if (!findUser) throw new HttpException(409, `This user ${jwtData.id} was not found`);
+
+      const payload: DataStoredInToken = { id: findUser.id };
+
+      const newAccessToken = this.jwtService.generateAccessToken(payload);
+      return newAccessToken;
+    } catch (err) {
+      throw new HttpException(403, 'Refresh token expired or invalid');
+    }
   }
 }

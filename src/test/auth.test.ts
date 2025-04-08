@@ -1,7 +1,9 @@
 import request from 'supertest';
+import { Container } from 'typedi';
 import { App } from '@/app';
 import { User } from '@interfaces/users.interface';
 import { AuthRoute } from '@routes/auth.route';
+import { JwtService } from '@services/jwt.service';
 
 afterAll(async () => {
   await new Promise<void>(resolve => setTimeout(() => resolve(), 500));
@@ -46,6 +48,20 @@ describe('TEST Authorization API', () => {
         .post('/login')
         .send(userData)
         .expect('Set-Cookie', /RefreshToken=.+/)
+        .expect(200);
+    });
+  });
+
+  describe('[GET] /refresh', () => {
+    it('response should have the Set-Cookie header with the Authorization token', () => {
+      const jwtService = Container.get(JwtService);
+      const payload = { id: 1 };
+      const refreshToken = jwtService.generateRefreshToken(payload);
+
+      return request(app.getServer())
+        .get('/refresh')
+        .set('Cookie', [`RefreshToken=${refreshToken}`])
+        .expect('Set-Cookie', /^Authorization=.+/)
         .expect(200);
     });
   });
