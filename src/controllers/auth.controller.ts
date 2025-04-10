@@ -72,13 +72,14 @@ export class AuthController {
     }
   };
 
-  // TODO: This API is broken and needs to be fixed
   public logOut = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const userData: User = req.user;
-      const logOutUserData: User = await this.auth.logout(userData);
-
-      res.status(200).json({ data: logOutUserData, message: 'logout' });
+      res.clearCookie('Authorization', {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: 'strict',
+      });
+      res.status(200).json({ message: 'logout' });
     } catch (error) {
       next(error);
     }
