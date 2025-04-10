@@ -14,4 +14,5 @@ export const {
   LOG_FORMAT,
   LOG_DIR,
   ORIGIN,
+  MONGO_URI,
 } = process.env;

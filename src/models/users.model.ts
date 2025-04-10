@@ -1,9 +1,18 @@
-import { User } from '@interfaces/users.interface';
+import mongoose, { Document, Schema } from 'mongoose';
 
-// password: password123456789
-export const UserModel: User[] = [
-  { id: 1, email: 'example1@email.com', password: '$2b$10$2YC2ht8x06Yto5VAr08kben8.oxjTPrMn0yJhv8xxSVVltH3bOs4u' },
-  { id: 2, email: 'example2@email.com', password: '$2b$10$2YC2ht8x06Yto5VAr08kben8.oxjTPrMn0yJhv8xxSVVltH3bOs4u' },
-  { id: 3, email: 'example3@email.com', password: '$2b$10$2YC2ht8x06Yto5VAr08kben8.oxjTPrMn0yJhv8xxSVVltH3bOs4u' },
-  { id: 4, email: 'example4@email.com', password: '$2b$10$2YC2ht8x06Yto5VAr08kben8.oxjTPrMn0yJhv8xxSVVltH3bOs4u' },
-];
+export interface UserDocument extends Document {
+  email: string;
+  password: string;
+}
+
+const userSchema = new Schema<UserDocument>(
+  {
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+  },
+  {
+    timestamps: true,
+  },
+);
+
+export const UserModel = mongoose.model<UserDocument>('User', userSchema);

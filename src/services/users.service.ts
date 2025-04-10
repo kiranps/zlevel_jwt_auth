@@ -1,54 +1,32 @@
-import { hash } from 'bcrypt';
 import { Service } from 'typedi';
-import { HttpException } from '@exceptions/HttpException';
 import { User } from '@interfaces/users.interface';
-import { UserModel } from '@models/users.model';
+import { UserRepo } from '@repos/users.repo'
 
 @Service()
 export class UserService {
+  constructor(private userRepo: UserRepo) {}
+
   public async findAllUser(): Promise<User[]> {
-    const users: User[] = UserModel;
-    return users;
+    return await this.userRepo.findAllUser();
   }
 
-  public async findUserById(userId: number): Promise<User> {
-    const findUser: User = UserModel.find(user => user.id === userId);
-    if (!findUser) throw new HttpException(409, "User doesn't exist");
-
-    return findUser;
+  public async findUserById(userId: string): Promise<User> {
+    return await this.userRepo.findUserById(userId);
   }
 
-  //TODO: This API IS NOT WORKING : TO BE FIXED
+  public async findUserByEmail(email: string): Promise<User> {
+    return await this.userRepo.findUserByEmail(email);
+  }
+
   public async createUser(userData: User): Promise<User> {
-    const findUser: User = UserModel.find(user => user.email === userData.email);
-    if (findUser) throw new HttpException(409, `This email ${userData.email} already exists`);
-
-    const hashedPassword = await hash(userData.password, 10);
-    const createUserData: User = { ...userData, id: UserModel.length + 1, password: hashedPassword };
-
-    return createUserData;
+    return await this.userRepo.createUser(userData);
   }
 
-  //TODO: This API IS NOT WORKING : TO BE FIXED
-  public async updateUser(userId: number, userData: User): Promise<User[]> {
-    const findUser: User = UserModel.find(user => user.id === userId);
-    if (!findUser) throw new HttpException(409, "User doesn't exist");
-
-    const hashedPassword = await hash(userData.password, 10);
-    const updateUserData: User[] = UserModel.map((user: User) => {
-      if (user.id === findUser.id) user = { ...userData, id: userId, password: hashedPassword };
-      return user;
-    });
-
-    return updateUserData;
+  public async updateUser(userId: string, userData: User): Promise<User> {
+    return await this.userRepo.updateUser(userId, userData);
   }
 
-  //TODO: This API IS NOT WORKING : TO BE FIXED
-  public async deleteUser(userId: number): Promise<User[]> {
-    const findUser: User = UserModel.find(user => user.id === userId);
-    if (!findUser) throw new HttpException(409, "User doesn't exist");
-
-    const deleteUserData: User[] = UserModel.filter(user => user.id !== findUser.id);
-    return deleteUserData;
+  public async deleteUser(userId: string): Promise<User> {
+    return await this.userRepo.deleteUser(userId);
   }
 }
