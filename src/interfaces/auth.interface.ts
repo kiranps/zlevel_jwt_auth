@@ -1,9 +1,8 @@
 import { Request } from 'express';
 import { User } from '@interfaces/users.interface';
 
-// TODO: This data needs to be stored in token
 export interface DataStoredInToken {
-  id: number;
+  id: string;
 }
 
 export interface TokenData {
@@ -13,4 +12,10 @@ export interface TokenData {
 
 export interface RequestWithUser extends Request {
   user: User;
+}
+
+export interface AuthResponse {
+  user: User;
+  accessToken: string;
+  refreshToken: string;
 }
