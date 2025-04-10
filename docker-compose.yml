@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+    command: ["npm", "test"]
+    environment:
+      - MONGOMS_DOWNLOAD_DIR=/mongodb-binaries
+    volumes:
+      - .:/usr/src/app
+      - ./mongodb-binaries:/mongodb-binaries
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
